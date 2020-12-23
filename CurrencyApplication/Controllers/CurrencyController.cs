@@ -6,26 +6,31 @@ using System.Threading.Tasks;
 using CurrencyApplication.Models;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace CurrencyApplication.Controllers
 {
     public class CurrencyController : Controller
     {
+        private readonly ILogger<CurrencyController> _logger;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private CurrencyModel currencyModel;
 
-        public CurrencyController(IWebHostEnvironment webHostEnvironment)
+        public CurrencyController(ILogger<CurrencyController> logger, IWebHostEnvironment webHostEnvironment)
         {
             _webHostEnvironment = webHostEnvironment;
+            _logger = logger;
         }
 
         public ActionResult Index()
         {
-            CurrencyModel currencyModel = new CurrencyModel();
+            currencyModel = new CurrencyModel();
 
             // Assign data to model or create new list for input and create new list for output on get
             if (GetInputData() != null)
             {
                 currencyModel.InputList = GetInputData().ToList();
+                _logger.LogInformation("Input data was successfully added");
             }
             else
             {
@@ -40,26 +45,32 @@ namespace CurrencyApplication.Controllers
         [HttpPost]
         public ActionResult Index(CurrencyModel currencyModel)
         {
-            // Assign data to model or create new list for input and output on post
-            if (GetInputData() != null)
+            if (ModelState.IsValid)
             {
-                currencyModel.InputList = GetInputData().ToList();
-            }
-            else
-            {
-                currencyModel.InputList = new List<string>();
-            }
+                // Assign data to model or create new list for input and output on post
+                if (GetInputData() != null)
+                {
+                    currencyModel.InputList = GetInputData().ToList();
+                    _logger.LogInformation("Input data was successfully added");
+                }
+                else
+                {
+                    currencyModel.InputList = new List<string>();
+                }
 
-            if (GetOutputData() != null)
-            {
-                currencyModel.OutputList = GetOutputData().ToList();
-            }
-            else
-            {
-                currencyModel.OutputList = new List<string>();
-            }
+                if (GetOutputData() != null)
+                {
+                    currencyModel.OutputList = GetOutputData().ToList();
+                    _logger.LogInformation("Output data was successfully added");
+                }
+                else
+                {
+                    currencyModel.OutputList = new List<string>();
+                }
 
-            return View(currencyModel);
+                return View(currencyModel);
+            }
+            return View();
         }
 
         public List<string> GetInputData()
@@ -70,6 +81,7 @@ namespace CurrencyApplication.Controllers
 
             if (file != null)
             {
+                _logger.LogInformation("File was successfully found");
                 StreamReader streamReader = new StreamReader(file);
                 string currentLine = string.Empty;
 
@@ -83,6 +95,7 @@ namespace CurrencyApplication.Controllers
 
                 if (inputList.Count != 0)
                 {
+                    _logger.LogInformation("Input list created");
                     return inputList;
                 }
                 else
@@ -168,6 +181,7 @@ namespace CurrencyApplication.Controllers
                         //Adds results of maximum minus minimum to result list
                         outputList.Add((maximum - minimum).ToString());
                     }
+                    _logger.LogInformation("Output list created");
                     return outputList;
                 }
                 else
