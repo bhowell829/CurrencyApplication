@@ -14,19 +14,13 @@
                         @{
                             if (Model.InputList.Count == 0)
                             {
-                                <p>There is no input data. Please add data to currencySample.txt file in the root folder.</p>
+                                <p class="text-center">There is no input data. Please add data to currencySample.txt file in the root folder.</p>
                             }
                             else
                             {
-                                <h3 class="text-center">Input</h3>
+                                <h4 class="text-center">Input</h4>
                                 <hr />
-                                <h5>Click here for output data to the right</h5>
 
-                                using (Html.BeginForm("Index", "Currency", FormMethod.Post))
-                                {
-                                    <input type="submit" value="Get Data" class="btn btn-primary" />
-                                }
-                                <br />
                                 foreach (string input in Model.InputList)
                                 {
                                     <p>@input</p>
@@ -42,9 +36,17 @@
                             }
                             else
                             {
-                                <h3 class="text-center">Output</h3>
+                                <h4 class="text-center">Output</h4>
                                 <hr />
+
+                                using (Html.BeginForm("Index", "Currency", FormMethod.Post))
+                                {
+                                    <div class="pb-3">
+                                        <input type="submit" value="Get Output" class="btn btn-primary" />
+                                    </div>
+                                }
                                 int counter = 1;
+
                                 foreach (string output in Model.OutputList)
                                 {
                                     if (output == "DenomOutOfScope")
