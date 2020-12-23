@@ -75,7 +75,7 @@ namespace CurrencyApplication.Controllers
 
         public List<string> GetInputData()
         {
-            //Get filepath of text file from root path
+            // Get filepath of text file from root path
             List<string> inputList = new List<string>();
             string file = Path.Combine(_webHostEnvironment.WebRootPath, "files", "currencySample.txt");
 
@@ -85,7 +85,7 @@ namespace CurrencyApplication.Controllers
                 StreamReader streamReader = new StreamReader(file);
                 string currentLine = string.Empty;
 
-                //Continues through file as long as there is data
+                // Continue through file as long as there is data
                 while ((currentLine = streamReader.ReadLine()) != null)
                 {
                     inputList.Add(currentLine);
@@ -120,7 +120,7 @@ namespace CurrencyApplication.Controllers
                     List<string> outputList = new List<string>();
                     int dataSets = Int32.Parse(inputStack.Pop());
 
-                    //Loop through dataSets
+                    // Loop through dataSets
                     for (int a = 0; a < dataSets; a++)
                     {
                         string[] denomPrice = inputStack.Pop().Split();
@@ -131,21 +131,21 @@ namespace CurrencyApplication.Controllers
                         List<int> factorsList = new List<int>();
                         string[] factors = inputStack.Pop().Split();
 
-                        //Validation for range of denom
+                        // Validation for range of denom
                         if (denom < 2 || denom > 7)
                         {
                             outputList.Add("DenomOutOfScope");
                             return outputList;
                         }
 
-                        //Validation for range of price
+                        // Validation for range of price
                         if (price < 2 || price > 10)
                         {
                             outputList.Add("PriceOutOfScope");
                             return outputList;
                         }
 
-                        //D-1 loop then add elements from factors array to list
+                        //Loop through denom - 1 then add elements from factors array to list
                         for (int b = 0; b < denom - 1; b++)
                         {
                             factorsList.Add(Int32.Parse(factors[b]));
@@ -154,31 +154,31 @@ namespace CurrencyApplication.Controllers
                         int minimum = Int32.MaxValue;
                         int maximum = 0;
 
-                        //Loop through prices
+                        // Loop through prices
                         for (int c = 0; c < price; c++)
                         {
                             int totalQuantity = 0;
                             string[] quantity = inputStack.Pop().Split();
 
-                            //Loops through denominations
+                            // Loop through denominations
                             for (int d = 0; d < denom; d++)
                             {
                                 int numQuantity = Int32.Parse(quantity[d]);
                                 totalQuantity += numQuantity;
 
-                                //Checks to see if d isn't equal to denom - 1 then multiplies index d from list array by total
+                                // Check to see if d isn't equal to denom - 1 then multiplies index d from list array by total
                                 if (d != denom - 1)
                                 {
                                     totalQuantity *= factorsList[d];
                                 }
                             }
 
-                            //Assigns both minimum of two values and maximum of two values to variables
+                            //Assign both minimum of two values and maximum of two values to variables
                             minimum = Math.Min(minimum, totalQuantity);
                             maximum = Math.Max(maximum, totalQuantity);
                         }
 
-                        //Adds results of maximum minus minimum to result list
+                        // Add results of maximum minus minimum to result list
                         outputList.Add((maximum - minimum).ToString());
                     }
                     _logger.LogInformation("Output list created");
