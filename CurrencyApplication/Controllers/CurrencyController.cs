@@ -121,14 +121,14 @@ namespace CurrencyApplication.Controllers
                         //Validation for range of denom
                         if (denom < 2 || denom > 7)
                         {
-                            outputList.Add("-1");
+                            outputList.Add("DenomOutOfScope");
                             return outputList;
                         }
 
                         //Validation for range of price
                         if (price < 2 || price > 10)
                         {
-                            outputList.Add("-1");
+                            outputList.Add("PriceOutOfScope");
                             return outputList;
                         }
 

@@ -47,11 +47,16 @@
                                 int counter = 1;
                                 foreach (string output in Model.OutputList)
                                 {
-                                    if (output == "-1")
+                                    if (output == "DenomOutOfScope")
                                     {
                                         <p>
-                                            Check the data coming in for denominations and price. Denominations can't be less than 2 or greater than 7.
-                                            Prices can't be less than 2 or greater than 10.
+                                            Denominations in text file can't be less than 2 or greater than 7.
+                                        </p>
+                                    }
+                                    else if (output == "PriceOutOfScope")
+                                    {
+                                        <p>
+                                            Prices in text file can't be less than 2 or greater than 10.
                                         </p>
                                     }
                                     else
