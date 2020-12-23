@@ -79,9 +79,8 @@ namespace CurrencyApplication.Controllers
             List<string> inputList = new List<string>();
             string file = Path.Combine(_webHostEnvironment.WebRootPath, "files", "currencySample.txt");
 
-            if (file != null)
+            try
             {
-                _logger.LogInformation("File was successfully found");
                 StreamReader streamReader = new StreamReader(file);
                 string currentLine = string.Empty;
 
@@ -93,106 +92,86 @@ namespace CurrencyApplication.Controllers
 
                 streamReader.Close();
 
-                if (inputList.Count != 0)
-                {
-                    _logger.LogInformation("Input list created");
-                    return inputList;
-                }
-                else
-                {
-                    return null;
-                }
+                _logger.LogInformation("File was found");
+                return inputList;
             }
-            else
+            catch (Exception e)
             {
-                return null;
+                _logger.LogInformation("File was not found");
+                throw e;
             }
         }
 
         public List<string> GetOutputData()
         {
-            if (GetInputData() != null)
+            Stack<string> inputStack = new Stack<string>(GetInputData().ToArray().Reverse());
+            List<string> outputList = new List<string>();
+            int dataSets = Int32.Parse(inputStack.Pop());
+
+            // Loop through dataSets
+            for (int a = 0; a < dataSets; a++)
             {
-                Stack<string> inputStack = new Stack<string>(GetInputData().ToArray().Reverse());
+                string[] denomPrice = inputStack.Pop().Split();
 
-                if (inputStack.Count != 0)
+                int denom = Int32.Parse(denomPrice[0]);
+                int price = Int32.Parse(denomPrice[1]);
+
+                List<int> factorsList = new List<int>();
+                string[] factors = inputStack.Pop().Split();
+
+                // Validation for range of denom
+                if (denom < 2 || denom > 7)
                 {
-                    List<string> outputList = new List<string>();
-                    int dataSets = Int32.Parse(inputStack.Pop());
-
-                    // Loop through dataSets
-                    for (int a = 0; a < dataSets; a++)
-                    {
-                        string[] denomPrice = inputStack.Pop().Split();
-
-                        int denom = Int32.Parse(denomPrice[0]);
-                        int price = Int32.Parse(denomPrice[1]);
-
-                        List<int> factorsList = new List<int>();
-                        string[] factors = inputStack.Pop().Split();
-
-                        // Validation for range of denom
-                        if (denom < 2 || denom > 7)
-                        {
-                            outputList.Add("DenomOutOfScope");
-                            return outputList;
-                        }
-
-                        // Validation for range of price
-                        if (price < 2 || price > 10)
-                        {
-                            outputList.Add("PriceOutOfScope");
-                            return outputList;
-                        }
-
-                        //Loop through denom - 1 then add elements from factors array to list
-                        for (int b = 0; b < denom - 1; b++)
-                        {
-                            factorsList.Add(Int32.Parse(factors[b]));
-                        }
-
-                        int minimum = Int32.MaxValue;
-                        int maximum = 0;
-
-                        // Loop through prices
-                        for (int c = 0; c < price; c++)
-                        {
-                            int totalQuantity = 0;
-                            string[] quantity = inputStack.Pop().Split();
-
-                            // Loop through denominations
-                            for (int d = 0; d < denom; d++)
-                            {
-                                int numQuantity = Int32.Parse(quantity[d]);
-                                totalQuantity += numQuantity;
-
-                                // Check to see if d isn't equal to denom - 1 then multiplies index d from list array by total
-                                if (d != denom - 1)
-                                {
-                                    totalQuantity *= factorsList[d];
-                                }
-                            }
-
-                            //Assign both minimum of two values and maximum of two values to variables
-                            minimum = Math.Min(minimum, totalQuantity);
-                            maximum = Math.Max(maximum, totalQuantity);
-                        }
-
-                        // Add results of maximum minus minimum to result list
-                        outputList.Add((maximum - minimum).ToString());
-                    }
-                    _logger.LogInformation("Output list created");
+                    outputList.Add("DenomOutOfScope");
                     return outputList;
                 }
-                else
+
+                // Validation for range of price
+                if (price < 2 || price > 10)
                 {
-                    return null;
+                    outputList.Add("PriceOutOfScope");
+                    return outputList;
                 }
+
+                //Loop through denom - 1 then add elements from factors array to list
+                for (int b = 0; b < denom - 1; b++)
+                {
+                    factorsList.Add(Int32.Parse(factors[b]));
+                }
+
+                int minimum = Int32.MaxValue;
+                int maximum = 0;
+
+                // Loop through prices
+                for (int c = 0; c < price; c++)
+                {
+                    int totalQuantity = 0;
+                    string[] quantity = inputStack.Pop().Split();
+
+                    // Loop through denominations
+                    for (int d = 0; d < denom; d++)
+                    {
+                        int numQuantity = Int32.Parse(quantity[d]);
+                        totalQuantity += numQuantity;
+
+                        // Check to see if d isn't equal to denom - 1 then multiplies index d from list array by total
+                        if (d != denom - 1)
+                        {
+                            totalQuantity *= factorsList[d];
+                        }
+                    }
+
+                    //Assign both minimum of two values and maximum of two values to variables
+                    minimum = Math.Min(minimum, totalQuantity);
+                    maximum = Math.Max(maximum, totalQuantity);
+                }
+
+                // Add results of maximum minus minimum to result list
+                outputList.Add((maximum - minimum).ToString());
             }
-            else
-            {
-                return null;
-            }
+
+            _logger.LogInformation("Output list created");
+            return outputList;
         }
     }
 }
