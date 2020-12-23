@@ -1,0 +1,71 @@
+﻿@model CurrencyApplication.Models.CurrencyModel
+@{
+    ViewData["Title"] = "Currency";
+}
+
+<div class="row p-5 d-flex justify-content-center">
+    <div class="col-md-12">
+        <div class="card text-center">
+            <div class="card-body">
+                <h1>Currency</h1>
+                <hr />
+                <div class="row text-left text-muted">
+                    <div class="col-md-6">
+                        @{
+                            if (Model.InputList.Count == 0)
+                            {
+                                <p>There is no input data. Please add data to currency_sample.txt file.</p>
+                            }
+                            else
+                            {
+                                <h3>Input</h3>
+                                <hr />
+                                <h4>Click here for output data to the right</h4>
+
+                                using (Html.BeginForm("Index", "Currency", FormMethod.Post))
+                                {
+                                    <input type="submit" value="Get Output" class="btn btn-primary" />
+                                }
+                                <br />
+                                foreach (string i in Model.InputList)
+                                {
+                                    <p>@i</p>
+                                }
+                            }
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        @{
+                            if (Model.OutputList.Count == 0 && Model.InputList.Count == 0)
+                            {
+                                <p></p>
+                            }
+                            else
+                            {
+                                <h3>Output</h3>
+                                <hr />
+                                int x = 1;
+                                foreach (string i in Model.OutputList)
+                                {
+                                    string m = i;
+                                    if (m == "-1")
+                                    {
+                                        <p>
+                                            Check the data coming in for denominations and price. Denominations can't be less than 2 or greater than 7.
+                                            Prices can't be less than 2 or greater than 10.
+                                        </p>
+                                    }
+                                    else
+                                    {
+                                        <p>Dataset @x: @i</p>
+                                        x++;
+                                    }
+                                }
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
