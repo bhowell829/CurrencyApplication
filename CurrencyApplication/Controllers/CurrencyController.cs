@@ -20,34 +20,43 @@ namespace CurrencyApplication.Controllers
 
         public ActionResult Index()
         {
-            //Creates lists
             CurrencyModel currencyModel = new CurrencyModel();
 
-            //Checks if data is returned in GetInputData. If so, it loops through to add items to list
+            // Assign data to model or create new list for input and create new list for output on get
             if (GetInputData() != null)
             {
                 currencyModel.InputList = GetInputData().ToList();
             }
+            else
+            {
+                currencyModel.InputList = new List<string>();
+            }
 
             currencyModel.OutputList = new List<string>();
 
-            //Returns model through view
             return View(currencyModel);
         }
 
-        //Post index method that passes in CurrencyModel
         [HttpPost]
         public ActionResult Index(CurrencyModel currencyModel)
         {
-            //Checks if data is returned in GetInputData and GetOutputData. If so, it loops through to add items to list
+            // Assign data to model or create new list for input and output on post
             if (GetInputData() != null)
             {
                 currencyModel.InputList = GetInputData().ToList();
+            }
+            else
+            {
+                currencyModel.InputList = new List<string>();
             }
 
             if (GetOutputData() != null)
             {
                 currencyModel.OutputList = GetOutputData().ToList();
+            }
+            else
+            {
+                currencyModel.OutputList = new List<string>();
             }
 
             return View(currencyModel);
@@ -55,28 +64,26 @@ namespace CurrencyApplication.Controllers
 
         public List<string> GetInputData()
         {
-            //Creates list and local variables, gets path from .txt file in App_Data and passes to StreamReader
-            List<string> fileContent = new List<string>();
-            string file = Path.Combine(_webHostEnvironment.WebRootPath, "files", "currency_sample.txt");
+            //Get filepath of text file from root path
+            List<string> inputList = new List<string>();
+            string file = Path.Combine(_webHostEnvironment.WebRootPath, "files", "currencySample.txt");
+
             if (file != null)
             {
-                StreamReader sr = new StreamReader(file);
+                StreamReader streamReader = new StreamReader(file);
                 string currentLine = string.Empty;
 
-                //Loop that if currentLine is not null while reading lines, then will add currentline to fileContent list
-                while ((currentLine = sr.ReadLine()) != null)
+                //Continues through file as long as there is data
+                while ((currentLine = streamReader.ReadLine()) != null)
                 {
-                    fileContent.Add(currentLine);
+                    inputList.Add(currentLine);
                 }
 
-                //Close StreamReader
-                sr.Close();
+                streamReader.Close();
 
-                //If else to see if fileContent list contains anything. If so, adds to array and returns array. If not, returns null.
-                if (fileContent.Count != 0)
+                if (inputList.Count != 0)
                 {
-                    //string[] lines = fileContent.ToArray();
-                    return fileContent;
+                    return inputList;
                 }
                 else
                 {
@@ -91,86 +98,77 @@ namespace CurrencyApplication.Controllers
 
         public List<string> GetOutputData()
         {
-            //Makes sure there is input data in .txt file
             if (GetInputData() != null)
             {
-                //Creates stack
                 Stack<string> inputStack = new Stack<string>(GetInputData().ToArray().Reverse());
 
-                //Checks if stack is not empty, otherwise returns null
                 if (inputStack.Count != 0)
                 {
-                    //Initializes new list and assigns element from stack to K and removes it from stack
-                    List<string> result = new List<string>();
+                    List<string> outputList = new List<string>();
                     int dataSets = Int32.Parse(inputStack.Pop());
 
-                    //Loop through as long as i is less than K
-                    for (int i = 0; i < dataSets; i++)
+                    //Loop through dataSets
+                    for (int a = 0; a < dataSets; a++)
                     {
-                        //Initializes array, splits elements, and assigns next element from stack to denom_price and removes it from stack
-                        string[] denom_price = inputStack.Pop().Split();
+                        string[] denomPrice = inputStack.Pop().Split();
 
-                        //Adds first index of denom_price array to int variable denom
-                        int denom = Int32.Parse(denom_price[0]);
-                        //Validation for range of denom and if outside, add -1 to result list for validation in View
-                        if (denom < 2 || denom > 7)
-                        {
-                            result.Add("-1");
-                            return result;
-                        }
+                        int denom = Int32.Parse(denomPrice[0]);
+                        int price = Int32.Parse(denomPrice[1]);
 
-                        //Adds next index of denom_price array to int variable price
-                        int price = Int32.Parse(denom_price[1]);
-                        //Validation for range of price and if outside, add -1 to result list for validation in View
-                        if (price < 2 || price > 10)
-                        {
-                            result.Add("-1");
-                            return result;
-                        }
-
-                        //Create new list and assigns elements from stack to factors array and removes it from stack
-                        var list = new List<int>();
+                        List<int> factorsList = new List<int>();
                         string[] factors = inputStack.Pop().Split();
 
-                        //D-1 loop then add elements from factors array to list
-                        for (int j = 0; j < denom - 1; j++)
+                        //Validation for range of denom
+                        if (denom < 2 || denom > 7)
                         {
-                            list.Add(Int32.Parse(factors[j]));
+                            outputList.Add("-1");
+                            return outputList;
                         }
 
-                        //Initializes minimum and maximum for 32 bit integer
+                        //Validation for range of price
+                        if (price < 2 || price > 10)
+                        {
+                            outputList.Add("-1");
+                            return outputList;
+                        }
+
+                        //D-1 loop then add elements from factors array to list
+                        for (int b = 0; b < denom - 1; b++)
+                        {
+                            factorsList.Add(Int32.Parse(factors[b]));
+                        }
+
                         int minimum = Int32.MaxValue;
                         int maximum = 0;
 
-                        //Loops through prices as long as j is less than price
-                        for (int j = 0; j < price; j++)
+                        //Loop through prices
+                        for (int c = 0; c < price; c++)
                         {
-                            //Create new local variable total and assigns elements from stack to row array and removes it from stack
-                            int total = 0;
-                            string[] row = inputStack.Pop().Split();
+                            int totalQuantity = 0;
+                            string[] quantity = inputStack.Pop().Split();
 
-                            //Loops through denom as long as k is less than price
-                            for (int k = 0; k < denom; k++)
+                            //Loops through denominations
+                            for (int d = 0; d < denom; d++)
                             {
-                                //Initializes num int with k index from q_row array then adds num to total
-                                int num = Int32.Parse(row[k]);
-                                total += num;
+                                int numQuantity = Int32.Parse(quantity[d]);
+                                totalQuantity += numQuantity;
 
-                                //Checks to see if k isn't equal to denom - 1 then multiplies index k from list array by total
-                                if (k != denom - 1)
+                                //Checks to see if d isn't equal to denom - 1 then multiplies index d from list array by total
+                                if (d != denom - 1)
                                 {
-                                    total *= list[k];
+                                    totalQuantity *= factorsList[d];
                                 }
                             }
+
                             //Assigns both minimum of two values and maximum of two values to variables
-                            minimum = Math.Min(minimum, total);
-                            maximum = Math.Max(maximum, total);
+                            minimum = Math.Min(minimum, totalQuantity);
+                            maximum = Math.Max(maximum, totalQuantity);
                         }
+
                         //Adds results of maximum minus minimum to result list
-                        result.Add((maximum - minimum).ToString());
+                        outputList.Add((maximum - minimum).ToString());
                     }
-                    //Changes result list to array and returns it
-                    return result;
+                    return outputList;
                 }
                 else
                 {

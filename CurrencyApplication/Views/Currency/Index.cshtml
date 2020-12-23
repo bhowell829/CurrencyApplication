@@ -14,7 +14,7 @@
                         @{
                             if (Model.InputList.Count == 0)
                             {
-                                <p>There is no input data. Please add data to currency_sample.txt file.</p>
+                                <p>There is no input data. Please add data to currency_sample.txt file in the root folder.</p>
                             }
                             else
                             {
@@ -24,12 +24,12 @@
 
                                 using (Html.BeginForm("Index", "Currency", FormMethod.Post))
                                 {
-                                    <input type="submit" value="Get Output" class="btn btn-primary" />
+                                    <input type="submit" class="btn btn-primary" />
                                 }
                                 <br />
-                                foreach (string i in Model.InputList)
+                                foreach (string input in Model.InputList)
                                 {
-                                    <p>@i</p>
+                                    <p>@input</p>
                                 }
                             }
                         }
@@ -44,11 +44,10 @@
                             {
                                 <h3>Output</h3>
                                 <hr />
-                                int x = 1;
-                                foreach (string i in Model.OutputList)
+                                int counter = 1;
+                                foreach (string output in Model.OutputList)
                                 {
-                                    string m = i;
-                                    if (m == "-1")
+                                    if (output == "-1")
                                     {
                                         <p>
                                             Check the data coming in for denominations and price. Denominations can't be less than 2 or greater than 7.
@@ -57,8 +56,8 @@
                                     }
                                     else
                                     {
-                                        <p>Dataset @x: @i</p>
-                                        x++;
+                                        <p>Dataset @counter: @output</p>
+                                        counter++;
                                     }
                                 }
                             }
